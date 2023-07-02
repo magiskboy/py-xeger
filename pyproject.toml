@@ -1,0 +1,65 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "py-xeger"
+description = "String generator from Regex"
+readme = "README.md"
+requires-python = ">=2"
+authors = [
+    { name = "Nguyen Khac Thanh", email = "nguyenkhacthanh244@gmail.com" },
+]
+license = "MIT"
+dynamic = ["version"]
+keywords=['regular expressions regexp testing random generator']
+classifiers = [
+    'Development Status :: 3 - Alpha',
+    'Intended Audience :: Developers',
+    'License :: OSI Approved :: MIT License',
+    'Topic :: Software Development :: Build Tools',
+    'Programming Language :: Python :: 3.6',
+    'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+]
+
+[project.optional-dependencies]
+dev = [
+    "mypy",
+    "ruff",
+    "pytest==7.3.1",
+    "pytest-cov==4.0.0",
+]
+
+[project-urls]
+Homepage = "https://github.com/magiskboy/py-xeger"
+
+[tool.hatch.version]
+path = "xeger/__init__.py"
+
+[tool.mypy]
+ignore_missing_imports = true
+check_untyped_defs = true
+
+[tool.coverage.run]
+omit = ["tests/*"]
+
+[tool.coverage.path]
+source = "xeger"
+
+[tool.coverage.report]
+fail_under = 100
+show_missing = true
+sort = "Cover"
+exclude_lines = [
+    "import sre_parse",
+    "sre_parse = re.sre_parse",
+    "sre_parse = re._parser",
+]
+
+
+[tool.ruff]
+ignore = ["E501"]

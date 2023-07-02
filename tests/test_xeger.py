@@ -1,5 +1,4 @@
 import re
-import unittest
 import xeger
 import pytest
 
@@ -23,6 +22,15 @@ def test_dot():
     """
     for i in range(100):
         match(r'.+')
+
+
+def test_raise_TypeError_when_passing_invalid_value():
+    with pytest.raises(TypeError):
+        match(123)
+
+
+def test_date_with_Pattern_class():
+    match(re.compile(r'^([1-9]|0[1-9]|[12][0-9]|3[01])\D([1-9]|0[1-9]|1[012])\D()$'))
 
 
 def test_date():

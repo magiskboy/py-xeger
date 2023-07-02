@@ -5,28 +5,29 @@ https://bitbucket.org/leapfrogdevelopment/rstr/
 In turn inspired by the Java library Xeger:
 http://code.google.com/p/xeger/
 """
+from typing import Dict, Any, Callable, Union, List, Optional
 import re
 import sys
 import string
 import itertools
 from random import Random
 
-if sys.version_info[0] >= 3:
-    unichr = chr
-    xrange = range
-try:
-    import sre_parse
-except ImportError:
-    if hasattr(re, "sre_parse"):
-        sre_parse = re.sre_parse
-    else:
-        sre_parse = re._parser
+py_version = sys.version_info
 
-class Xeger(object):
-    def __init__(self, limit=10, seed=None):
-        super(Xeger, self).__init__()
-        self._limit = limit
-        self._cache = dict()
+if py_version.minor < 11:
+    import sre_parse           # type: ignore
+
+elif py_version == 11 and py_version.releaselevel != 'final':
+    sre_parse = re.sre_parse   # type: ignore
+
+else:
+    sre_parse = re._parser     # type: ignore
+
+
+class Xeger:
+    def __init__(self, limit: Optional[int] = 10, seed: Optional[Any] = None):
+        self._limit = limit or 10
+        self._cache: Dict[str, str] = dict()
 
         self._random = Random()
         self.random_choice = self._random.choice
@@ -34,7 +35,7 @@ class Xeger(object):
         if seed:
             self.seed(seed)
 
-        self._alphabets = {
+        self._alphabets: Dict[str, str] = {
             'printable': string.printable,
             'letters': string.ascii_letters,
             'uppercase': string.ascii_uppercase,
@@ -55,7 +56,7 @@ class Xeger(object):
             'domainsafe': string.ascii_letters + string.digits + '-'
         }
 
-        self._categories = {
+        self._categories: Dict[str, Callable] = {
             "category_digit": lambda: self._alphabets['digits'],
             "category_not_digit": lambda: self._alphabets['nondigits'],
             "category_space": lambda: self._alphabets['whitespace'],
@@ -64,14 +65,14 @@ class Xeger(object):
             "category_not_word": lambda: self._alphabets['nonword'],
         }
 
-        self._cases = {
-            "literal": lambda x: unichr(x),
+        self._cases: Dict[str, Callable] = {
+            "literal": lambda x: chr(x),
             "not_literal":
-                lambda x: self.random_choice(string.printable.replace(unichr(x), '')),
+                lambda x: self.random_choice(string.printable.replace(chr(x), '')),
             "at": lambda x: '',
             "in": lambda x: self._handle_in(x),
             "any": lambda x: self.random_choice(string.printable.replace('\n', '')),
-            "range": lambda x: [unichr(i) for i in xrange(x[0], x[1] + 1)],
+            "range": lambda x: [chr(i) for i in range(x[0], x[1] + 1)],
             "category": lambda x: self._categories[str(x).lower()](),
             'branch':
                 lambda x: ''.join(self._handle_state(i) for i in self.random_choice(x[1])),
@@ -84,11 +85,13 @@ class Xeger(object):
             'negate': lambda x: [False],
         }
 
-    def xeger(self, string_or_regex):
-        try:
-            pattern = string_or_regex.pattern
-        except AttributeError:
-            pattern = string_or_regex
+    def xeger(self, regex: Union[str, re.Pattern]) -> str:
+        if isinstance(regex, str):
+            pattern = regex
+        elif isinstance(regex, re.Pattern):
+            pattern = regex.pattern
+        else:
+            raise TypeError("regex must be string or re.Pattern")
 
         parsed = sre_parse.parse(pattern)
         result = self._build_string(parsed)
@@ -100,34 +103,31 @@ class Xeger(object):
         return self._random
 
     @random.setter
-    def random(self, random_instance):
+    def random(self, random_instance: Random):
         self._random = random_instance
         self.random_choice = self._random.choice
         self.random_int = self._random.randint
 
-    def seed(self, seed):
+    def seed(self, seed: Any):
         self._random.seed(seed)
 
-    def _build_string(self, parsed):
-        newstr = []
+    def _build_string(self, parsed) -> str:
+        newstr: List[str] = []
         for state in parsed:
             newstr.append(self._handle_state(state))
         return ''.join(newstr)
 
-    def _handle_state(self, state):
+    def _handle_state(self, state) -> str:
         opcode, value = state
         return self._cases[str(opcode).lower()](value)
 
-    def _handle_group(self, value):
-        if sys.version_info < (3,6):
-            result = ''.join(self._handle_state(i) for i in value[1])
-        else:
-            result = ''.join(self._handle_state(i) for i in value[3])
+    def _handle_group(self, value: List[str]) -> str:
+        result = ''.join(self._handle_state(i) for i in value[3])
         if value[0]:
             self._cache[value[0]] = result
         return result
 
-    def _handle_in(self, value):
+    def _handle_in(self, value) -> str:
         candidates = list(itertools.chain(*(self._handle_state(i) for i in value)))
         if candidates[0] is False:
             candidates = set(string.printable).difference(candidates[1:])
@@ -135,10 +135,10 @@ class Xeger(object):
         else:
             return self.random_choice(candidates)
 
-    def _handle_repeat(self, start_range, end_range, value):
+    def _handle_repeat(self, start_range: int, end_range: int, value) -> str:
         result = []
-        end_range = min((end_range, self._limit))
+        end_range = min(end_range, self._limit)
         times = self.random_int(start_range, max(start_range, end_range))
-        for i in xrange(times):
+        for i in range(times):
             result.append(''.join(self._handle_state(i) for i in value))
         return ''.join(result)
