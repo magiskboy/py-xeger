@@ -1,6 +1,6 @@
 ![py-xeger](https://i.ibb.co/6tch0qk/py-xeger-3.png)
 
-![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/magiskboy/py-xeger/ci.yml)
+[![CI](https://github.com/magiskboy/py-xeger/actions/workflows/ci.yml/badge.svg)](https://github.com/magiskboy/py-xeger/actions/workflows/ci.yml)
 ![Codecov](https://img.shields.io/codecov/c/github/magiskboy/py-xeger)
 ![GitHub](https://img.shields.io/github/license/magiskboy/py-xeger)
 ![PyPI](https://img.shields.io/pypi/v/py-xeger)
