@@ -55,6 +55,7 @@ fail_under = 100
 show_missing = true
 sort = "Cover"
 exclude_lines = [
+    "elif py_version == 11 and py_version.releaselevel != 'final':",
     "import sre_parse",
     "sre_parse = re.sre_parse",
     "sre_parse = re._parser",
