@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "py-xeger"
 description = "String generator from Regex"
 readme = "README.md"
-requires-python = ">=2"
+requires-python = ">=3.6"
 authors = [
     { name = "Nguyen Khac Thanh", email = "nguyenkhacthanh244@gmail.com" },
 ]
@@ -34,8 +34,11 @@ dev = [
     "pytest-cov==4.0.0",
 ]
 
-[project-urls]
+[project.urls]
 Homepage = "https://github.com/magiskboy/py-xeger"
+Documentation = "https://github.com/magiskboy/py-xeger"
+Issues = "https://github.com/magiskboy/py-xeger/issues/"
+Source = "https://github.com/magiskboy/py-xeger"
 
 [tool.hatch.version]
 path = "xeger/__init__.py"
